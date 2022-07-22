@@ -16,7 +16,7 @@ This game engine has all the basic rules of Blackjack accounted for:
 
 - All the non-numerical cards equal to 10 (Jack, Queen and King)
 
-- The ace (1) value depends: if the value in hand wil surpass 21, its value is one. Otherwise, it's 11.
+- The ace (1) value depends: if the value in hand will surpass 21, its value is one. Otherwise, it's 11.
 
 - If the sum of the cards in hand surpass 21, the player is loses.
 
