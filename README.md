@@ -56,6 +56,8 @@ The engine's core is done. With some graphical upgrades, and some new modules, a
 
 Maybe we can add some currency to the game to give a sense of loss. We all know how humans are susceptible to the "loss aversion" phenomenom. Why not playing with that a bit? :)
 
+Double down would be an interesting ability to explore too.
+
 ## Licensing
 
 This code is for educational purposes only. MIT licensed. Do not take this as a production-ready code.
