@@ -18,7 +18,7 @@ This game engine has all the basic rules of Blackjack accounted for:
 
 - The ace (1) value depends on the following rule: if the value in hand will surpass 21, its value is one. Otherwise, it's 11.
 
-- If the sum of the cards in hand surpass 21, the player loses.
+- If the sum of the cards in hand surpasses 21, the player loses.
 
 
 ## Some casino caveats
