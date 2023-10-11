@@ -1,5 +1,5 @@
 /*
-	The game "engine"
+The game "engine"
 */
 package engine
 
@@ -63,8 +63,14 @@ func guessPlay(d *deck.Deck, h *hand.Hand) any {
 	// Record the current timestamp
 	start := time.Now()
 	h.Stats()
+
 	fmt.Println("What's the value? (time's ticking...): ")
 	fmt.Scanln(&userInput)
+
+	for userInput == "" {
+		fmt.Println("You can't give an empty answer! What's the value? (time's still ticking...): ")
+		fmt.Scanln(&userInput)
+	}
 	// When user has pressed enter
 	end := time.Now()
 	rTime := end.Sub(start).Seconds()
@@ -214,7 +220,7 @@ func endOfPlay() {
 }
 
 /*
-	Returns the percentage that partialNumber represents from totalNumber.
+Returns the percentage that partialNumber represents from totalNumber.
 */
 func percentOfNumber(totalNumber int, partialNumber int) int {
 	// X = (100 * vp ) / vt
