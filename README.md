@@ -41,7 +41,7 @@ Special inputs:
 
 - bj (BlackJack): you asserted your hand is a blackjack. The game will check if that's true.
 
-- l (lost): you asserted your hand is a loser. The value is bigger than 21.
+- b (bust): you asserted your hand is a loser. The value is bigger than 21.
 
 - mr (debug function: MONSTER REBORN!): artificially triggers the removal of all cards from the graveyard and back into the game.
 

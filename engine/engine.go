@@ -105,10 +105,10 @@ func guessPlay(d *deck.Deck, h *hand.Hand) any {
 				fmt.Printf("Actual value was %d \n", h.Count)
 				return true
 			}
-		case "l":
+		case "b":
 			// User asserted that this play is lost for him.
 			if h.Count > 21 {
-				fmt.Println(cl.Blue + "You guessed a lost play." + cl.Reset)
+				fmt.Println(cl.Blue + "BUST! You guessed it right." + cl.Reset)
 				fmt.Printf("Last sum was: %d \n", h.Count)
 				return true
 			} else {
