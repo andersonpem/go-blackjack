@@ -1,17 +1,21 @@
 package rng
 
 import (
-	"math/rand"
-	"time"
+	"crypto/rand"
+	"math/big"
 )
 
-/*
-	Too many s̶o̶r̶c̶e̶r̶e̶r̶s̶ repetitions in code. DRY.
-*/
+// RandomInteger generates a cryptographically secure random number in the range [0, ceil).
+// It uses crypto/rand for better security and panics on error.
+func RandomInteger(ceil int) int {
+	if ceil <= 0 {
+		panic("ceil must be positive")
+	}
 
-// Intn the recreation of the timestamp on each call assures a different seed.
-func Intn(ceil int) int {
-	var source = rand.NewSource(time.Now().UnixNano())
-	var random = rand.New(source)
-	return random.Intn(ceil)
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(ceil)))
+	if err != nil {
+		panic(err)
+	}
+
+	return int(n.Int64())
 }

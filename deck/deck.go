@@ -1,7 +1,8 @@
+package deck
+
 /*
 	The entire game Deck
 */
-package deck
 
 import (
 	"blackjack/card"
@@ -23,14 +24,14 @@ func (d *Deck) Shuffle(message string) {
 	}
 
 	for i := range d.Cards {
-		newPosition := rng.Intn(len(d.Cards) - 1)
+		newPosition := rng.RandomInteger(len(d.Cards) - 1)
 		d.Cards[i], d.Cards[newPosition] = d.Cards[newPosition], d.Cards[i]
 	}
 }
 
 // PickRand Picks a random card out of the deck
 func (d *Deck) PickRand() card.Card {
-	pos := rng.Intn(len(d.Cards) - 1)
+	pos := rng.RandomInteger(len(d.Cards) - 1)
 	c := d.Cards[pos]
 	d.Cards = card.RemoveCardByIndex(d.Cards, pos)
 	return c
