@@ -36,7 +36,7 @@ func (h *House) Stats(hideFirstCard bool) {
 	if h.Hand.Cards != nil {
 		fmt.Println("House's hand:")
 		if hideFirstCard {
-			names = append(names, "Hidden Card")
+			names = append(names, "[Hidden Card]")
 			// Append the visible card (index 1)
 			if len(h.Hand.Cards) > 1 {
 				c := h.Hand.Cards[1]
