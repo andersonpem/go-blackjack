@@ -11,7 +11,6 @@ type House struct {
 	Hand hand.Hand
 }
 
-// HitUntil17 keeps drawing cards until the hand value is 17 or more.
 func (h *House) HitUntil17(d *deck.Deck) {
 	for h.Hand.Count < 17 {
 		fmt.Println(cl.Blue + "House hits..." + cl.Reset)
@@ -21,8 +20,6 @@ func (h *House) HitUntil17(d *deck.Deck) {
 	}
 }
 
-// IsUpcardAce checks if the house's visible card is an Ace.
-// Assumes the second card (index 1) is the up-card.
 func (h *House) IsUpcardAce() bool {
 	if len(h.Hand.Cards) == 2 {
 		return h.Hand.Cards[1].Name == "Ace"
@@ -30,14 +27,12 @@ func (h *House) IsUpcardAce() bool {
 	return false
 }
 
-// Stats prints the house's hand. The first card is hidden if hideFirstCard is true.
 func (h *House) Stats(hideFirstCard bool) {
 	var names []string
 	if h.Hand.Cards != nil {
 		fmt.Println("House's hand:")
 		if hideFirstCard {
-			names = append(names, "[Hidden Card]")
-			// Append the visible card (index 1)
+			names = append(names, "Hidden Card")
 			if len(h.Hand.Cards) > 1 {
 				c := h.Hand.Cards[1]
 				names = append(names, c.Name+"["+c.Suit+"]")
@@ -54,7 +49,6 @@ func (h *House) Stats(hideFirstCard bool) {
 	}
 }
 
-// New creates a new house player and deals two cards from the deck.
 func New(d *deck.Deck) House {
 	h := House{}
 	h.Hand.Add(d.PickNext()) // Hole card
