@@ -3,13 +3,12 @@ package main
 import "blackjack/engine"
 
 func main() {
-
 	/*
 		Some Todos:
-		* For a realistic blackjack experience, keep the game going until it's reasonable another 4 players have lost
-		* In this case, every new round has to reset the player stack
-		* After N rounds (or x blackjacks), re-shuffle the deck no matter how many cards are there
-		* Create a player type when on multiplayer mode
+		* Implement betting and a player wallet.
+		* Add more player actions like "Double Down" and "Split".
+		* Create a player type to support a multiplayer mode.
+		* Refine the UI for a cleaner presentation.
 	*/
 
 	// Starts the game engine and the game loop

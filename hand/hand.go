@@ -1,6 +1,6 @@
 /*
-	A hand is a stack of cards of a single player. If we have multiple players, each one has its own hand.
-	If we have a house logic, the house has a hand with 1 card visible and 1 card hidden in the start.
+A hand is a stack of cards of a single player. If we have multiple players, each one has its own hand.
+If we have a house logic, the house has a hand with 1 card visible and 1 card hidden in the start.
 */
 package hand
 
@@ -17,52 +17,46 @@ type Hand struct {
 }
 
 /*
-	Add: adds a new card to the player's hand.
+Add: adds a new card to the player's hand.
 */
 func (h *Hand) Add(c card.Card) {
-	stack := append(h.Cards, c)
+	h.Cards = append(h.Cards, c)
+	h.recalculate()
+}
 
-	h.Cards = stack
+// IsBlackjack checks if the hand is a natural 21 with two cards.
+func (h *Hand) IsBlackjack() bool {
+	return len(h.Cards) == 2 && h.Count == 21
+}
+
+/*
+recalculate: updates the hand's count, handling Aces correctly.
+*/
+func (h *Hand) recalculate() {
 	h.Count = 0
+	aceCount := 0
 
-	// Let's leave the aces to process lastly.
-	var aces []card.Card
-
-	// Re-calculate the stack value
-	// Firstly, handle all non-special cards (second condition)
+	// Sum non-ace cards first
 	for _, c := range h.Cards {
 		if c.Name == "Ace" {
-			// Keep track of which indices are aces in the hand
-			aces = append(aces, c)
+			aceCount++
 		} else {
-			// All cards but the ace have only a single defined value
 			h.Count += c.Value[0]
 		}
 	}
 
-	/*
-		Now, let's handle the aces
-		Bear in mind that we can have up to 4 aces in a 4 deck game, so let's take no assumptions of value
-	*/
-	if len(aces) > 0 {
-		var amount = len(aces)
-		/*
-			Let's fetch the first card just to have the reference values.
-			Let's assume we don't know the variable values
-		*/
-		var sample = aces[0]
-
-		if h.Count+(amount*sample.Value[1]) <= 21 {
-			h.Count += amount * sample.Value[1]
+	// Add aces, treating them as 11 unless it causes a bust
+	for i := 0; i < aceCount; i++ {
+		if h.Count+11 <= 21 {
+			h.Count += 11
 		} else {
-			// No assumptions. I know the value is 1, however let's make it dynamic.
-			h.Count += amount * sample.Value[0]
+			h.Count += 1
 		}
 	}
 }
 
 /*
-	Stats: Prints out a player's stats including the suit of each card.
+Stats: Prints out a player's stats including the suit of each card.
 */
 func (h Hand) Stats() {
 	var names []string
@@ -72,8 +66,11 @@ func (h Hand) Stats() {
 		}
 		fmt.Printf("Your hand: [%d cards]\n", len(h.Cards))
 		fmt.Println(cl.Yellow, names, cl.Reset)
+		fmt.Printf("Your count: %d\n", h.Count)
 	} else {
-		fmt.Println("Somehow your stack is empty. This is not supposed to happen. Call the admins!")
+		fmt.Println(
+			"Somehow your stack is empty. This is not supposed to happen. Call the admins!",
+		)
 		os.Exit(1)
 	}
 }
