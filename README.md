@@ -2,7 +2,7 @@
 
 A Go-based Blackjack game engine where you play against the house.
 
-This project started as a simple exercise to practice Go fundamentals and has evolved into a playable console-based Blackjack game. It implements standard casino rules, including multiple decks, betting, insurance, and automatic reshuffling.
+This project started as a simple exercise to practice Go fundamentals and has evolved into a playable console-based Blackjack game. It implements standard casino rules and unique features to keep the game engaging.
 
 ## Scope
 
@@ -15,6 +15,15 @@ This game engine has all the basic rules of Blackjack accounted for:
 -   The Ace value is handled dynamically (1 or 11) to the player's best advantage.
 -   If the sum of cards surpasses 21, it's a "bust" (loss).
 -   **Insurance**: When the dealer's up-card is an Ace, you can place an insurance side-bet.
+
+## Special Features
+
+To keep the game exciting, we've added dynamic features based on your performance:
+
+-   **Hot Streak:** If you win more than 4 hands in a row, the house gets "nervous" and shuffles the deck 5 times to change the flow of the cards.
+-   **Lucky Break:** The game randomly offers you a bonus on the next hand to help you. You can choose between:
+    -   **Peeking** at the house's hidden card.
+    -   Activating a **Safety Net**, where a loss on that hand becomes a push.
 
 ## Some casino caveats
 
@@ -29,7 +38,7 @@ Build the game with its modules and run it.
 
 You'll be asked for a starting balance and the number of decks to use.
 
-Before each hand, you must enter a bet. The game will then deal the cards.
+Before each hand, you must enter a bet. You can press Enter to repeat your last bet. The game will then deal the cards.
 
 You can then choose your action:
 

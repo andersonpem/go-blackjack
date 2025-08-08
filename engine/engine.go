@@ -17,6 +17,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 )
 
 /*
@@ -27,7 +28,9 @@ var plays = 0
 var gamePlayer player.Player
 var housePlayer = house.House{}
 var lastBet int
-var consecutiveWins int // Track consecutive player wins
+var consecutiveWins int
+var consecutiveLosses int // Track consecutive player losses
+var safetyNetActive bool  // Flag for the "Lucky Break" bonus
 
 var reshuffleEveryPlays = 5
 var reviveCardsWhenLessThan = 40
@@ -85,15 +88,13 @@ func newGame() {
 }
 
 func newPlay() {
-	// Reset player and house hands
 	gamePlayer.Hand = hand.Hand{}
 	housePlayer = house.New(&gameDeck)
 
-	// Deal cards
 	gamePlayer.Hand.Add(gameDeck.PickNext())
-	housePlayer.Hand.Add(gameDeck.PickNext()) // Hole card
+	housePlayer.Hand.Add(gameDeck.PickNext())
 	gamePlayer.Hand.Add(gameDeck.PickNext())
-	housePlayer.Hand.Add(gameDeck.PickNext()) // Up card
+	housePlayer.Hand.Add(gameDeck.PickNext())
 
 	cls()
 	cl.Pfln(
@@ -104,11 +105,18 @@ func newPlay() {
 }
 
 func endOfPlay(bet int, outcome string, playerBlackjack bool) {
-	// Payout and consecutive win logic
+	// Apply safety net if active
+	if safetyNetActive && outcome == "loss" {
+		outcome = "push"
+		cl.Pfln("Safety Net activated! Your bet is safe.", cl.Green)
+	}
+	safetyNetActive = false // Always reset after use
+
 	if playerBlackjack {
 		payout := (bet * 3) / 2
 		gamePlayer.Balance += payout
 		consecutiveWins++
+		consecutiveLosses = 0
 		cl.Pfln(
 			fmt.Sprintf("BLACKJACK! You win $%d (3:2 payout).", payout),
 			cl.Green,
@@ -118,20 +126,22 @@ func endOfPlay(bet int, outcome string, playerBlackjack bool) {
 		case "win":
 			gamePlayer.Balance += bet
 			consecutiveWins++
+			consecutiveLosses = 0
 			cl.Pfln(fmt.Sprintf("You win $%d!", bet), cl.Green)
 		case "loss":
 			gamePlayer.Balance -= bet
-			consecutiveWins = 0 // Streak broken
+			consecutiveWins = 0
+			consecutiveLosses++
 			cl.Pfln(fmt.Sprintf("You lose $%d.", bet), cl.Red)
 		case "push":
-			consecutiveWins = 0 // Streak broken
+			consecutiveWins = 0
+			consecutiveLosses = 0
 			cl.Pfln("Push! Your bet is returned.", cl.Yellow)
 		}
 	}
 
 	fmt.Printf("Your new balance is $%d\n", gamePlayer.Balance)
 
-	// Collect all cards from the table
 	Grave.Add(gamePlayer.Hand.Cards)
 	Grave.Add(housePlayer.Hand.Cards)
 
@@ -155,7 +165,6 @@ func getBet(reader *bufio.Reader) int {
 
 		betInput, _ := reader.ReadString('\n')
 		trimmedInput := strings.TrimSpace(betInput)
-
 		var currentBet int
 
 		if trimmedInput == "" {
@@ -183,6 +192,43 @@ func getBet(reader *bufio.Reader) int {
 	}
 }
 
+func handleLuckyBreak(reader *bufio.Reader) {
+	cl.Pfln(
+		fmt.Sprintf(
+			"Lucky you! Time for a Lucky Break!",
+		),
+		cl.Yellow,
+	)
+	fmt.Println("Choose your bonus for this hand:")
+	fmt.Println("1: Peek at the House's hole card")
+	fmt.Println("2: Activate Safety Net (loss becomes a push)")
+
+	for {
+		fmt.Print("Your choice (1 or 2): ")
+		choiceInput, _ := reader.ReadString('\n')
+		choice := strings.TrimSpace(choiceInput)
+
+		if choice == "1" {
+			cl.Pfln("Lucky Break: Peeking at the hole card!", cl.Blue)
+			housePlayer.Stats(false) // Reveal the full hand
+			fmt.Println("Memorize it! The card will be hidden again in 5 seconds...")
+			time.Sleep(5 * time.Second)
+			break
+		} else if choice == "2" {
+			safetyNetActive = true
+			cl.Pfln(
+				"Lucky Break: Safety Net is ACTIVE for this hand!",
+				cl.Blue,
+			)
+			time.Sleep(2 * time.Second)
+			break
+		} else {
+			cl.Pfln("Invalid choice. Please enter 1 or 2.", cl.Red)
+		}
+	}
+	consecutiveLosses = 0 // Reset counter after offering the bonus
+}
+
 func gameLoop() {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -194,6 +240,15 @@ func gameLoop() {
 
 		currentBet := getBet(reader)
 		newPlay()
+
+		// Handle Lucky Break before showing hands
+		if consecutiveLosses >= 4 {
+			handleLuckyBreak(reader)
+			// Redisplay screen after bonus
+			cls()
+			cl.Pfln("Let's play your Lucky Break hand!", cl.Blue)
+			fmt.Println("--------------------------------------------------")
+		}
 
 		housePlayer.Stats(true)
 		gamePlayer.Hand.Stats()
@@ -230,10 +285,8 @@ func gameLoop() {
 		}
 
 		houseTurn()
-
 		outcome := determineWinner()
 		endOfPlay(currentBet, outcome, false)
-
 		checkReshuffleConditions()
 	}
 }
@@ -328,7 +381,6 @@ func determineWinner() string {
 }
 
 func checkReshuffleConditions() {
-	// New check for consecutive wins
 	if consecutiveWins > 4 {
 		cl.Pfln(
 			fmt.Sprintf(
@@ -338,10 +390,10 @@ func checkReshuffleConditions() {
 			cl.Yellow,
 		)
 		for i := 0; i < 5; i++ {
-			gameDeck.Shuffle("") // Pass empty string for default message
+			gameDeck.Shuffle("")
 		}
-		consecutiveWins = 0 // Reset the counter after the special shuffle
-		return              // No need to check other shuffle conditions
+		consecutiveWins = 0
+		return
 	}
 
 	if percentOfNumber(gameDeckSize, len(gameDeck.Cards)) <= reviveCardsWhenLessThan {
